@@ -1,4 +1,4 @@
-lubuntu-meta (99.21.04.1) hirsute; urgency=medium
+lubuntu-meta (21.12.1) hirsute; urgency=medium
 
   * Updated tooling configuration for Hirsute.
   * Added check for germinate in update script.
