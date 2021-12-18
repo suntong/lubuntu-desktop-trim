@@ -34,16 +34,15 @@ jobs:
         id: cache_nfpm
         # Do before install nfpm
         with:
-          key: nfpm
-          path: ~/bin
+          key: nfpm-bin
+          path: /bin/nfpm
 
       - name: Install nfpm
-        #working-directory: /
+        working-directory: /
         if: steps.cache_nfpm.outputs.cache-hit != 'true'
         run: |
-          curl -sfL https://git.io/JDkED | sudo sh -x
-          realpath ./bin
-          ls -l ./bin/nfpm
+          curl -sfL https://git.io/JDkED | sudo sh
+          ls -l /bin/nfpm
 
       - name: Cache cloudsmith
         uses: actions/cache@v2
