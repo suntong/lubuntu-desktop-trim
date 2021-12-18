@@ -25,7 +25,8 @@ Provides: lubuntu-gtk-core,
           lubuntu-qt-core,
           lubuntu-qt-desktop
 Description: Lubuntu Desktop environment
- This metapackage depends on all components which make up the Lubuntu Desktop.
+ This metapackage depends on trimmed down components which make up the
+ Lubuntu Desktop.
  .
- It is also used to help ensure proper upgrades, but it can be safely removed
- if you want to remove some applications installed by default.
+ It is also used to help ensure proper upgrades. If you want to remove
+ some applications, submit an issue to the git repo.
