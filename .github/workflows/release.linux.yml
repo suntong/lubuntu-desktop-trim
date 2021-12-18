@@ -52,10 +52,8 @@ jobs:
         id: cache_cloudsmith
         # Do before install cloudsmith
         with:
-          key: cloudsmith
-          path: |
-            /usr/lib/python3
-            ~/.cache/pip
+          key: ${{ env.pythonLocation }}
+          path: ${{ env.pythonLocation }}
 
       - name: Install Cloudsmith CLI
         if: steps.cache_cloudsmith.outputs.cache-hit != 'true'
