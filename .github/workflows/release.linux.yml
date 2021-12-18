@@ -1,0 +1,107 @@
+name: release (linux)
+
+on:
+  release:
+    types:
+      - created
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          # - arch: amd64
+          #   cc:   gcc
+          # - arch: arm64
+          #   cc:   aarch64-linux-gnu-gcc
+          # - pkg: apk
+          - pkg: deb
+          # - pkg: rpm
+
+    env:
+      PKG: ${{ matrix.pkg }}
+
+      # GOOS:   linux
+      # GOARCH: ${{ matrix.arch }}
+      # CC:     ${{ matrix.cc }}
+
+    steps:
+      - name: Cache nfpm
+        uses: actions/cache@v2
+        id: cache_nfpm
+        # Do before install nfpm
+        with:
+          key: nfpm
+          path: ~/bin
+
+      - name: Install nfpm
+        #working-directory: /
+        if: steps.cache_nfpm.outputs.cache-hit != 'true'
+        run: |
+          curl -sfL https://git.io/JDkED | sudo sh -x
+          realpath ./bin
+          ls -l ./bin/nfpm
+
+      - name: Cache cloudsmith
+        uses: actions/cache@v2
+        id: cache_cloudsmith
+        # Do before install cloudsmith
+        with:
+          key: cloudsmith
+          path: |
+            /usr/lib/python3
+            ~/.cache/pip
+
+      - name: Install Cloudsmith CLI
+        if: steps.cache_cloudsmith.outputs.cache-hit != 'true'
+        run: pip install --upgrade cloudsmith-cli
+        # Cloudsmith CLI tooling for pushing releases
+        # See https://help.cloudsmith.io/docs/cli
+
+      - id: release
+        uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Set release
+        run: |
+          if [ "x${{ steps.release.outputs.tag_name }}" = 'x' ]; then
+            echo "RELEASE_VERSION=0.0.1" >> $GITHUB_ENV
+          else
+            echo "RELEASE_VERSION=${{ steps.release.outputs.tag_name }}" >> $GITHUB_ENV
+            echo msg: ${{ steps.release.outputs.name }}
+          fi
+
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          echo "RELEASE_VERSION=${RELEASE_VERSION}"
+          env | grep RELEASE_VERSION=
+          nfpm pkg --config .github/nfpm.yaml --packager ${{ env.PKG }} --target dist
+
+      # Publish to cloudsmith to repo
+      - name: Publish package to cloudsmith
+        env:
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          for filename in dist/*; do
+            echo "Pushing '$filename' to cloudsmith repo"
+            if [ ${{ env.PKG }} = 'apk' ]; then
+              cloudsmith push alpine suntong/repo/alpine/any-version $filename
+            else
+              cloudsmith push ${{ env.PKG }} suntong/repo/any-distro/any-version $filename
+            fi
+          done
+
+      - name: Upload release package
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.release.outputs.name }}
+          files: ./dist/dbab*
+          generate_release_notes: true
