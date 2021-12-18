@@ -112,8 +112,8 @@ contents:
   - src: README.md
     dst: /usr/share/doc/lubuntu-desktop-trim/README.md
 
-  - src: LICENSE
-    dst: /usr/share/doc/lubuntu-desktop-trim/copyright
+  # - src: LICENSE
+  #   dst: /usr/share/doc/lubuntu-desktop-trim/copyright
     # packager: deb
 
   # Simple symlink at /usr/local/bin/foo which points to /sbin/foo, which is
