@@ -1,5 +1,8 @@
 name: release (linux)
 
+env:
+  PkgName: lubuntu-desktop-trim
+
 on:
   release:
     types:
@@ -84,6 +87,7 @@ jobs:
           echo "RELEASE_VERSION=${RELEASE_VERSION}"
           env | grep RELEASE_VERSION=
           nfpm pkg --config .github/nfpm.yaml --packager ${{ env.PKG }} --target dist
+          ls -l dist
 
       # Publish to cloudsmith to repo
       - name: Publish package to cloudsmith
@@ -103,5 +107,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.release.outputs.name }}
-          files: ./dist/dbab*
+          files: ./dist/${{ env.PkgName }}*
           generate_release_notes: true
