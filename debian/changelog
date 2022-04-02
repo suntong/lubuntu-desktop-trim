@@ -1,3 +1,11 @@
+lubuntu-meta (22.04.02) hirsute; urgency=medium
+
+  * fix cloudsmith caching - cache entire Python environment
+  * fix caching entire Python environment, nok; cache pip instead
+  * update for LU22R1
+
+ -- Tong Sun <suntong@cpan.org>  Sat, 02 Apr 2022 00:02:25 -0400
+
 lubuntu-meta (21.12.18) hirsute; urgency=medium
 
   * publishing to central cloudsmith repo
